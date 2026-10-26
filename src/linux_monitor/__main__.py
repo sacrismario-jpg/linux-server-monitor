@@ -1,0 +1,59 @@
+"""Punto de entrada de Linux Server Monitor."""
+
+import json
+import sys
+
+from linux_monitor.diagnostics import collect_and_diagnose
+EXIT_CODES = {
+    "OK": 0,
+    "WARNING": 1,
+    "CRITICAL": 2,
+    "UNKNOWN": 3,
+}
+
+def main() -> int:
+    """Ejecuta el diagnóstico y muestra el informe."""
+
+    try:
+        report = collect_and_diagnose()
+    except Exception as exc:
+        print(f"Error al ejecutar el diagnóstico: {exc}", file=sys.stderr)
+        return 4
+
+    if "--json" in sys.argv[1:]:
+        print(json.dumps(report, indent=2, ensure_ascii=False))
+        return EXIT_CODES[report["status"]]
+
+    print("=" * 50)
+    print("         LINUX SERVER MONITOR")
+    print("=" * 50)
+    print(f"\nEstado general: {report['status']}")
+    print("\nMÉTRICAS")
+
+    for metric in report["metrics"]:
+        value = metric["value"]
+        value_text = f"{value:.2f} %" if value is not None else "N/D"
+
+        print(
+            f"  {metric['metric'].upper():<8} "
+            f"{value_text:<12} "
+            f"{metric['status']:<8} "
+            f"- {metric['message']}"
+        )
+
+    summary = report["summary"]
+
+    print("\nRESUMEN")
+    print(f"  Total de métricas: {summary['total']}")
+    print(f"  OK:                {summary['ok']}")
+    print(f"  WARNING:           {summary['warning']}")
+    print(f"  CRITICAL:          {summary['critical']}")
+    print(f"  UNKNOWN:           {summary['unknown']}")
+
+    print("=" * 50)
+
+    return EXIT_CODES[report["status"]]
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -1,0 +1,27 @@
+# Entorno virtual
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.coverage
+
+# Informes generados
+reports/*
+
+# Entorno y configuración local
+.env
+.env.*
+
+# Editores
+.vscode/
+.idea/
+
+# Copias de seguridad y archivos temporales
+*.bak
+*.tmp
+
+# Archivos de entorno local
+.venv*/
