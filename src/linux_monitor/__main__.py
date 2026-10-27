@@ -40,7 +40,19 @@ def main() -> int:
             f"{metric['status']:<8} "
             f"- {metric['message']}"
         )
+    services = report.get("services")
 
+    if services:
+        print("\nSERVICIOS")
+        print(f"  Estado: {services['status']}")
+        print(f"  {services['message']}")
+
+        if services["failed"]:
+            for service in services["failed"]:
+                print(
+                    f"  - {service['unit']}: "
+                    f"{service['active']} ({service['description']})"
+                )
     summary = report["summary"]
 
     print("\nRESUMEN")

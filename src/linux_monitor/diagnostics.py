@@ -124,6 +124,7 @@ def collect_and_diagnose() -> dict:
         memory_metrics,
         disk_metrics,
     )
+    from .services import failed_services 
 
     metrics = {}
 
@@ -146,4 +147,34 @@ def collect_and_diagnose() -> dict:
     except (OSError, RuntimeError, ValueError, KeyError):
         metrics["disk"] = None
 
-    return diagnose_system(metrics)
+    report = diagnose_system(metrics)
+
+    try:
+        services = failed_services()
+        report["services"] = {
+            "status": "WARNING" if services else "OK",
+            "failed": services,
+            "message": (
+                f"Se han detectado {len(services)} servicios fallidos"
+                if services
+                else "No hay servicios fallidos"
+            ),
+        }
+
+        if services and report["status"] == Status.OK.value:
+            report["status"] = Status.WARNING.value
+
+    except (OSError, RuntimeError, ValueError) as exc:
+        report["services"] = {
+            "status": "UNKNOWN",
+            "failed": None,
+            "message": f"No se pudo consultar systemd: {exc}",
+        }
+
+        if report["status"] not in (
+            Status.CRITICAL.value,
+            Status.WARNING.value,
+        ):
+            report["status"] = Status.UNKNOWN.value
+
+    return report
