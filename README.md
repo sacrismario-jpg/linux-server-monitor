@@ -28,10 +28,10 @@ El desarrollo y las pruebas iniciales se han realizado en Zorin OS 18.1, basado 
 
 ## Instalación para desarrollo
 
-Clona el repositorio cuando esté publicado y entra en su directorio:
+Clona el repositorio y entra en su directorio:
 
 ```bash
-git clone <URL_DEL_REPOSITORIO>
+git clone https://github.com/sacrismario-jpg/linux-server-monitor.git
 cd linux-server-monitor
 ```
 
@@ -116,6 +116,16 @@ Estas funcionalidades se consideran pendientes hasta que estén implementadas y 
 
 ## Estado del proyecto
 
-**Versión inicial funcional en preparación para su publicación.**
+**Primera versión funcional publicada en GitHub.**
 
-El proyecto dispone de recolectores de métricas, diagnóstico, salida por terminal y JSON, además de una suite de pruebas automatizadas. El siguiente objetivo es completar la revisión del código y preparar el repositorio para su publicación en GitHub.
+Linux Server Monitor recopila métricas básicas de CPU, memoria RAM, swap y disco, evalúa su estado mediante umbrales y genera informes por terminal y JSON.
+
+La suite de pruebas automatizadas cuenta con 32 pruebas que han superado la última ejecución local registrada.
+
+### Próximas mejoras
+
+- Detección de servicios fallidos mediante `systemd`.
+- Consulta de errores recientes mediante `journalctl`.
+- Ampliación de las pruebas y documentación.
+
+Estas funcionalidades siguen pendientes de implementación y validación.
