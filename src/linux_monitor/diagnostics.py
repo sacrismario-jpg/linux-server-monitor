@@ -1,5 +1,5 @@
 """Diagnóstico de métricas del sistema Linux."""
-
+import subprocess
 from enum import Enum
 from math import isfinite
 
@@ -125,7 +125,8 @@ def collect_and_diagnose() -> dict:
         disk_metrics,
         system_metrics,
     )
-    from .services import failed_services 
+    from .services import failed_services
+    from .logs import journal_logs
 
     metrics = {}
     try:
@@ -155,6 +156,25 @@ def collect_and_diagnose() -> dict:
     report = diagnose_system(metrics)
     report["system"] = system
 
+    try:
+        logs = journal_logs(lines=5, priority="err")
+        report["logs"] = {
+            "status": "OK",
+            "count": len(logs),
+            "entries": logs,
+            "message": (
+                f"Se han obtenido {len(logs)} registros de error"
+                if logs
+                else "No hay registros de error recientes"
+            ),
+        }
+    except (OSError, RuntimeError, ValueError, subprocess.SubprocessError) as exc:
+        report["logs"] = {
+            "status": "UNKNOWN",
+            "count": 0,
+            "entries": [],
+            "message": f"No se pudieron consultar los logs: {exc}",
+        }
     try:
         services = failed_services()
         report["services"] = {
