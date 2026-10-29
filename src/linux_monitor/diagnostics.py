@@ -123,10 +123,15 @@ def collect_and_diagnose() -> dict:
         cpu_usage,
         memory_metrics,
         disk_metrics,
+        system_metrics,
     )
     from .services import failed_services 
 
     metrics = {}
+    try:
+        system = system_metrics()
+    except (OSError, RuntimeError, ValueError, IndexError):
+        system = None
 
     try:
         metrics["cpu"] = cpu_usage()
@@ -148,6 +153,7 @@ def collect_and_diagnose() -> dict:
         metrics["disk"] = None
 
     report = diagnose_system(metrics)
+    report["system"] = system
 
     try:
         services = failed_services()

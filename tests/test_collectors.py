@@ -5,6 +5,7 @@ from src.linux_monitor.collectors import (
     cpu_usage,
     disk_metrics,
     memory_metrics,
+    system_metrics,
 )
 
 
@@ -145,6 +146,47 @@ class TestDiskMetrics(unittest.TestCase):
     def test_disk_rejects_inconsistent_values(self, _mock_disk_usage):
         with self.assertRaises(RuntimeError):
             disk_metrics("/")
+
+class TestSystemMetrics(unittest.TestCase):
+
+    @patch("src.linux_monitor.collectors.Path.read_text")
+    @patch("src.linux_monitor.collectors.os.uname")
+    def test_system_metrics_returns_system_information(
+        self, mock_uname, mock_read_text
+    ):
+        mock_uname.return_value = type(
+            "Uname",
+            (),
+            {
+                "nodename": "test-host",
+                "release": "6.8.0",
+                "machine": "x86_64",
+            },
+        )()
+        mock_read_text.return_value = "3600.0 0.0"
+
+        result = system_metrics()
+
+        self.assertEqual(result["hostname"], "test-host")
+        self.assertEqual(result["kernel"], "6.8.0")
+        self.assertEqual(result["architecture"], "x86_64")
+        self.assertEqual(result["uptime_seconds"], 3600.0)
+
+    @patch(
+        "src.linux_monitor.collectors.Path.read_text",
+        side_effect=OSError("Error de lectura"),
+    )
+    def test_system_metrics_raises_runtime_error(self, mock_read_text):
+        with self.assertRaises(RuntimeError):
+            system_metrics()
+
+    @patch(
+        "src.linux_monitor.collectors.Path.read_text",
+        return_value="dato-invalido",
+    )
+    def test_system_metrics_rejects_invalid_uptime(self, mock_read_text):
+        with self.assertRaises(RuntimeError):
+            system_metrics()
 
 if __name__ == "__main__":
     unittest.main()

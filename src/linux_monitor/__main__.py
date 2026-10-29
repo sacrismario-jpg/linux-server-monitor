@@ -28,6 +28,25 @@ def main() -> int:
     print("         LINUX SERVER MONITOR")
     print("=" * 50)
     print(f"\nEstado general: {report['status']}")
+
+    system = report.get("system")
+
+    if system:
+        print("\nSISTEMA")
+        print(f"  Hostname:     {system['hostname']}")
+        print(f"  Kernel:       {system['kernel']}")
+        print(f"  Arquitectura: {system['architecture']}")
+
+        uptime = system["uptime_seconds"]
+        days, remainder = divmod(int(uptime), 86400)
+        hours, remainder = divmod(remainder, 3600)
+        minutes, seconds = divmod(remainder, 60)
+
+        print(
+            f"  Tiempo activo: {days}d "
+            f"{hours}h {minutes}m {seconds}s"
+        )
+
     print("\nMÉTRICAS")
 
     for metric in report["metrics"]:
