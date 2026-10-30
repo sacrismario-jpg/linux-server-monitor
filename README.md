@@ -193,3 +193,10 @@ La suite de pruebas cuenta con **49 pruebas automatizadas superadas** en la últ
 Proyecto personal desarrollado como práctica de Python y administración de sistemas Linux.
 
 Repositorio: https://github.com/sacrismario-jpg/linux-server-monitor
+
+## Licencia
+
+Este proyecto se distribuye bajo la licencia MIT.
+
+Consulta el archivo [LICENSE](LICENSE) para conocer las condiciones de uso,
+modificación y distribución.
