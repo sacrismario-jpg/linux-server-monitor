@@ -72,6 +72,17 @@ def main() -> int:
                     f"  - {service['unit']}: "
                     f"{service['active']} ({service['description']})"
                 )
+    logs = report.get("logs")
+
+    if logs:
+        print("\nLOGS DEL SISTEMA")
+        print(f"  Estado: {logs['status']}")
+        print(f"  {logs['message']}")
+
+        if logs["entries"]:
+            for entry in logs["entries"]:
+                print(f"  - {entry}")
+
     summary = report["summary"]
 
     print("\nRESUMEN")
